@@ -1,0 +1,93 @@
+# .github/workflows/build-and-release.yml
+#
+# 사용 전 준비사항 (GitHub 저장소 Settings > Secrets and variables > Actions):
+#   1) UNITY_LICENSE  : Unity 라이선스 파일(.ulf) 내용 전체 (Personal/Pro 라이선스 활성화용)
+#      - Pro/Plus 시트 라이선스라면 UNITY_EMAIL, UNITY_PASSWORD, UNITY_SERIAL 로 대체 가능
+#   2) 프로젝트 루트에 ProjectSettings, Assets 폴더가 있어야 하며 Git LFS 사용 시 lfs: true 유지
+#
+# 트리거:
+#   - v1.0.0 같은 태그를 push 하면 자동 빌드 + 해당 태그로 릴리즈 생성
+#   - Actions 탭에서 수동 실행(workflow_dispatch) 시 버전을 직접 입력 가능
+
+name: Build Unity WebGL and Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Release tag (예: v1.0.0)'
+        required: true
+        default: 'v0.0.1'
+
+jobs:
+  build:
+    name: Build WebGL
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          lfs: true
+
+      - name: Cache Unity Library folder
+        uses: actions/cache@v4
+        with:
+          path: Library
+          key: Library-WebGL-${{ hashFiles('Assets/**', 'Packages/**', 'ProjectSettings/**') }}
+          restore-keys: |
+            Library-WebGL-
+            Library-
+
+      - name: Build Unity WebGL project
+        uses: game-ci/unity-builder@v4
+        env:
+          UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
+          UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
+          UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
+        with:
+          targetPlatform: WebGL
+
+      - name: Zip WebGL build output
+        run: |
+          cd build/WebGL
+          zip -r ../../WebGLBuild.zip .
+
+      - name: Upload build as artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: WebGLBuild
+          path: WebGLBuild.zip
+
+  release:
+    name: Create GitHub Release
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Download build artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: WebGLBuild
+
+      - name: Determine tag name
+        id: tag
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "tag=${{ inputs.version }}" >> "$GITHUB_OUTPUT"
+          else
+            echo "tag=${{ github.ref_name }}" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Create Release and upload asset
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.tag.outputs.tag }}
+          name: ${{ steps.tag.outputs.tag }}
+          files: WebGLBuild.zip
+          generate_release_notes: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
