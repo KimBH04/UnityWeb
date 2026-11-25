@@ -209,6 +209,65 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 32306866}
   m_CullTransparentMesh: 1
+--- !u!1 &57964242
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 57964244}
+  - component: {fileID: 57964243}
+  m_Layer: 0
+  m_Name: DummyAds
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &57964243
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 57964242}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ed8216fc1a0ae57488118cb24bb817ce, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::DummyAds
+  networks:
+  - name: Network A
+    eCPM: 10
+    fillRate: 0.5
+  - name: Network B
+    eCPM: 9
+    fillRate: 0.6
+  - name: Network C
+    eCPM: 7
+    fillRate: 0.8
+  useBidding: 0
+  noFill: 0
+  askSeconds: 0.5
+  interstitialSeconds: 3
+  rewardedSeconds: 5
+--- !u!4 &57964244
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 57964242}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &167304271
 GameObject:
   m_ObjectHideFlags: 0
@@ -245,6 +304,7 @@ MonoBehaviour:
   hudText: {fileID: 226517107}
   newBestText: {fileID: 656296737}
   startPanel: {fileID: 1872971698}
+  adCooldown: 10
 --- !u!4 &167304273
 Transform:
   m_ObjectHideFlags: 0
@@ -2783,3 +2843,4 @@ SceneRoots:
   - {fileID: 1632538924}
   - {fileID: 1862720066}
   - {fileID: 1626651137}
+  - {fileID: 57964244}
